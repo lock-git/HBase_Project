@@ -5,6 +5,8 @@ import com.lock.ct.producer.bean.LocalFileDateProducer;
 import com.lock.ct.producer.io.LocalFileDataIn;
 import com.lock.ct.producer.io.LocalFileDataOut;
 
+import java.io.IOException;
+
 /**
  * author  Lock.xia
  * Date 2021-02-05
@@ -12,7 +14,7 @@ import com.lock.ct.producer.io.LocalFileDataOut;
  * 启动生产者
  */
 public class BootStrap {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // 构建生产者对象
         Producer producer = new LocalFileDateProducer();
 
@@ -24,6 +26,7 @@ public class BootStrap {
 
         // 生产数据
         producer.produce();
+        producer.close();
 
     }
 }

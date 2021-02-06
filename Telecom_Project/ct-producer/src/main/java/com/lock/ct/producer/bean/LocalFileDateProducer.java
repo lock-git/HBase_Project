@@ -89,22 +89,24 @@ public class LocalFileDateProducer implements Producer {
             }
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (IOException | ParseException | InterruptedException e) {
             e.printStackTrace();
         }
 
+        try {
+            out.close();
+            out = null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
     public void close() throws IOException {
-        if(in != null){
+        if (in != null) {
             in.close();
         }
-        if(out != null){
+        if (out != null) {
             out.close();
         }
     }
