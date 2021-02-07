@@ -1,13 +1,13 @@
 package com.lock.constant;
 
-import com.lock.bean.Val;
+        import com.lock.bean.Val;
 
 /**
  * author  Lock.xia
  * Date 2021-02-05
  */
 public enum Names implements Val {
-    KAFKA_TOPIC_CALLLOG("calllog");
+    KAFKA_TOPIC_CALLLOG("calllog"), NAMESPACE_CT("ct"), TABLE_CALLLOG("ct:call_log"),TABLE_FAMILY_INFO("info");
 
 
     private Names(String name) {
@@ -17,7 +17,7 @@ public enum Names implements Val {
     private String value;
 
 
-    public Object value() {
+    public String value() {
         return value;
     }
 }
