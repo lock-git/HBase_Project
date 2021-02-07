@@ -11,7 +11,7 @@ import java.io.IOException;
  * author  Lock.xia
  * Date 2021-02-05
  * <p>
- * 启动生产者
+ * 启动生产者:将数据写入某个文件中，flume[exec]监听后,[kafkaSink]写入Kafka
  */
 public class BootStrap {
     public static void main(String[] args) throws IOException {

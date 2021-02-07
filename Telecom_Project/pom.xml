@@ -11,6 +11,7 @@
     <modules>
         <module>tc-common</module>
         <module>ct-producer</module>
+        <module>ct-customer</module>
     </modules>
 
     <dependencies>

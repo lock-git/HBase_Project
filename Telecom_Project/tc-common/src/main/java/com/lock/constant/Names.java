@@ -7,7 +7,7 @@ import com.lock.bean.Val;
  * Date 2021-02-05
  */
 public enum Names implements Val {
-    ;
+    KAFKA_TOPIC_CALLLOG("calllog");
 
 
     private Names(String name) {
