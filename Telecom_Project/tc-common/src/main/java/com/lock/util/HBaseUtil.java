@@ -88,27 +88,7 @@ public class HBaseUtil {
         }
     }
 
-    /**
-     * 生成分区键
-     *
-     * @param regionCount
-     * @return
-     */
-    public static byte[][] genSplitKeys(int regionCount) {
 
-        int splitKeyCount = regionCount - 1;
-        List<byte[]> byteList = new ArrayList<>();
-        for (int i = 0; i < splitKeyCount; i++) {
-            // [-∞,0|), [0|,1|), [1|,+∞)  "|"的ASCII码，在所有字符中倒数第二大
-            String splitKey = i + Vals.STRING_TY.strValue();
-            byte[] bytes = Bytes.toBytes(splitKey);
-            byteList.add(bytes);
-        }
-        byteList.sort(new Bytes.ByteArrayComparator());
-        byte[][] splitKeys = new byte[splitKeyCount][];
-        byteList.toArray(splitKeys); // 将list转化为固定格式的数组: List<byte[]> ===> byte[][]
-        return splitKeys;
-    }
 
     /**
      * 删除表
@@ -133,7 +113,6 @@ public class HBaseUtil {
         } catch (NamespaceNotFoundException e) { // 不存在就创建新的namespace
             createNamespace(namespace);
         }
-
 
     }
 
@@ -162,7 +141,7 @@ public class HBaseUtil {
     }
 
     /**
-     * 获取分区号
+     * 获取rowKey的分区号
      *
      * @param call
      * @param date
@@ -179,5 +158,28 @@ public class HBaseUtil {
         // 异或算法 [相同为0，不同为1]==》 一般用于校验,有可能为负数
         int crc = Math.abs(callHashcode ^ yearMonthHashcode);
         return String.valueOf(crc % regionCount);
+    }
+
+    /**
+     * 生成分区键
+     *
+     * @param regionCount
+     * @return
+     */
+    public static byte[][] genSplitKeys(int regionCount) {
+
+
+        int splitKeyCount = regionCount - 1;
+        List<byte[]> byteList = new ArrayList<>();
+        for (int i = 0; i < splitKeyCount; i++) {
+            // [-∞,0|), [0|,1|), [1|,+∞)  "|"的ASCII码，在所有字符中倒数第二大
+            String splitKey = i + Vals.STRING_TY.strValue();
+            byte[] bytes = Bytes.toBytes(splitKey);
+            byteList.add(bytes);
+        }
+        byteList.sort(new Bytes.ByteArrayComparator());
+        byte[][] splitKeys = new byte[splitKeyCount][];
+        byteList.toArray(splitKeys); // 将list转化为固定格式的数组: List<byte[]> ===> byte[][]
+        return splitKeys;
     }
 }
