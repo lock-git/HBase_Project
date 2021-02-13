@@ -1,5 +1,6 @@
 package com.lock.util;
 
+import com.lock.constant.Formats;
 import com.lock.constant.Names;
 import com.lock.constant.Vals;
 import org.apache.hadoop.hbase.*;
@@ -10,7 +11,9 @@ import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -89,7 +92,6 @@ public class HBaseUtil {
     }
 
 
-
     /**
      * 删除表
      *
@@ -140,28 +142,9 @@ public class HBaseUtil {
 
     }
 
-    /**
-     * 获取rowKey的分区号
-     *
-     * @param call
-     * @param date
-     * @return
-     */
-    public static String genRegionNum(String call, String date, int regionCount) {
-
-        // 同一个月的放同一个分区 [20210101000000]
-        String yearMonth = date.substring(0, 6);
-        int callHashcode = call.hashCode();
-        int yearMonthHashcode = yearMonth.hashCode();
-
-        // 希望散列一下，无规律
-        // 异或算法 [相同为0，不同为1]==》 一般用于校验,有可能为负数
-        int crc = Math.abs(callHashcode ^ yearMonthHashcode);
-        return String.valueOf(crc % regionCount);
-    }
 
     /**
-     * 生成分区键
+     * 生成分区键:建表时进行预分区
      *
      * @param regionCount
      * @return
@@ -181,5 +164,69 @@ public class HBaseUtil {
         byte[][] splitKeys = new byte[splitKeyCount][];
         byteList.toArray(splitKeys); // 将list转化为固定格式的数组: List<byte[]> ===> byte[][]
         return splitKeys;
+    }
+
+    /**
+     * 获取rowKey的分区号
+     *
+     * @param call
+     * @param date
+     * @return
+     */
+    public static String genRegionNum(String call, String date, int regionCount) {
+
+        // 电话号码： 18801233456 [电话号码的后四位作为用户的唯一标识]
+        String userCode = call.substring(call.length() - 4);
+        // 后四位再反转一下 ==》 无规律
+        String userCodeRev = new StringBuilder().append(userCode).reverse().toString();
+
+        // 同一个月的放同一个分区 [20210101000000]
+        String yearMonth = date.substring(0, 6);
+        int callHashcode = userCodeRev.hashCode();
+        int yearMonthHashcode = yearMonth.hashCode();
+
+        // 希望散列一下，无规律
+        // 异或算法 [相同为0，不同为1]==》 一般用于校验,有可能为负数
+        int crc = Math.abs(callHashcode ^ yearMonthHashcode);
+        return String.valueOf(crc % regionCount);
+    }
+
+
+    /**
+     * 获取查询的rowkey的范围集合数据
+     * @param call
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public static List<String[]> getStartStopRows(String call, String startDate, String endDate) {
+
+        // 202101 ~ 202104 ==》
+            // 202101 ~ 202102|
+            // 202102 ~ 202103|
+            // 202103 ~ 202104|
+        ArrayList<String[]> rowsList = new ArrayList<>();
+        try {
+            Calendar s = Calendar.getInstance();
+            s.setTime(DateUtil.parse(startDate, Formats.DATE_YM));
+
+            Calendar e = Calendar.getInstance();
+            e.setTime(DateUtil.parse(startDate, Formats.DATE_YM));
+
+            while (s.getTimeInMillis() <= e.getTimeInMillis()){
+
+                String nowDate = DateUtil.format(s.getTime(),Formats.DATE_YM);
+                String regionNum = genRegionNum(call, nowDate, Vals.INT_6.intValue());
+                // 1_18801_202101
+                String startRow = regionNum + "_" + call + "_" + nowDate;
+                String endRow = startRow + "|";
+                String[] rows = {startRow,endRow};
+                rowsList.add(rows);
+                s.add(Calendar.MONTH , 1);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return rowsList;
     }
 }

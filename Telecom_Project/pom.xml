@@ -14,14 +14,6 @@
         <module>ct-customer</module>
     </modules>
 
-    <dependencies>
-
-        <dependency>
-            <groupId>com.huaban</groupId>
-            <artifactId>jieba-analysis</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>

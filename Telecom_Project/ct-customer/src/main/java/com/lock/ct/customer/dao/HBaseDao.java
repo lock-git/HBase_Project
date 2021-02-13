@@ -25,7 +25,6 @@ public class HBaseDao {
      */
     public void init() {
 
-
         try {
             HBaseUtil.start();
             // NX 有则不做操作
@@ -49,7 +48,9 @@ public class HBaseDao {
         String duration = putArr[3];
 
         // 建表时预分区 [提前分区，将数据分开放入,防止数据倾斜]
-        // 分区号 [如果分区比较多，可以补0 ==》 例如 111 个 分区，应该是 001 ，002,003,004，... ,111]
+        // 分区号 [如果分区比较多，可以在建表预分区和获取分区号的时候补0 ==》
+            // 例如预分区：[-∞,001|), [001|,002|), [002|,003|), ... ,[111|,+∞)
+            // 例如 111 个 分区，应该是 001,002,003,004，... ,111]
         String regionNum = HBaseUtil.genRegionNum(call1, calltime, Vals.INT_6.intValue());
 
         // rowKey 设计 [设计合理，避免数据倾斜]
