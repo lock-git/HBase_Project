@@ -2,19 +2,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>Telecom_Project</artifactId>
+        <groupId>com.lock</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.lock</groupId>
-    <artifactId>Telecom_Project</artifactId>
-    <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
-    <modules>
-        <module>tc-common</module>
-        <module>ct-producer</module>
-        <module>ct-customer</module>
-        <module>ct-commom-coprocesser</module>
-    </modules>
+    <artifactId>ct-commom-coprocesser</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.lock</groupId>
+            <artifactId>tc-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -53,6 +56,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>

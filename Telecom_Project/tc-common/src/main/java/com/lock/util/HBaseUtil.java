@@ -79,10 +79,28 @@ public class HBaseUtil {
      * @param tableName
      */
     public static void createTable(String tableName, int regionCount) throws IOException {
+        createTable(tableName, regionCount, null);
+    }
+
+    /**
+     * 创建表,自定义分区,添加协处理器
+     *
+     * @param tableName
+     * @param regionCount
+     * @param coprocessClass
+     * @throws IOException
+     */
+    public static void createTable(String tableName, int regionCount,
+                                   String coprocessClass) throws
+            IOException {
+
         Admin admin = adminHolder.get();
         HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(tableName));
         HColumnDescriptor hColumnDescriptor = new HColumnDescriptor(Names.TABLE_FAMILY_INFO.value());
         tableDescriptor.addFamily(hColumnDescriptor);
+        if (coprocessClass != null) {
+            tableDescriptor.addCoprocessor(coprocessClass);
+        }
         if (regionCount == 0) {
             admin.createTable(tableDescriptor);
         } else {
@@ -90,7 +108,6 @@ public class HBaseUtil {
             admin.createTable(tableDescriptor, splitKeys);
         }
     }
-
 
     /**
      * 删除表
@@ -124,7 +141,8 @@ public class HBaseUtil {
      *
      * @param tablename
      */
-    public static void createTableXX(String tablename, int regionCount) throws IOException {
+    public static void createTableXX(String tablename, int regionCount, String coprocessClass) throws
+            IOException {
         Admin admin = adminHolder.get();
         // 判断表是否存在
         if (admin.tableExists(TableName.valueOf(tablename))) {
@@ -132,7 +150,7 @@ public class HBaseUtil {
             delTable(tablename);
         }
         // 创建表
-        createTable(tablename, regionCount);
+        createTable(tablename, regionCount,coprocessClass);
     }
 
     public static Table getTable(String tableName) throws IOException {
@@ -194,6 +212,7 @@ public class HBaseUtil {
 
     /**
      * 获取查询的rowkey的范围集合数据
+     *
      * @param call
      * @param startDate
      * @param endDate
@@ -202,9 +221,9 @@ public class HBaseUtil {
     public static List<String[]> getStartStopRows(String call, String startDate, String endDate) {
 
         // 202101 ~ 202104 ==》
-            // 202101 ~ 202102|
-            // 202102 ~ 202103|
-            // 202103 ~ 202104|
+        // 202101 ~ 202102|
+        // 202102 ~ 202103|
+        // 202103 ~ 202104|
         ArrayList<String[]> rowsList = new ArrayList<>();
         try {
             Calendar s = Calendar.getInstance();
@@ -213,16 +232,16 @@ public class HBaseUtil {
             Calendar e = Calendar.getInstance();
             e.setTime(DateUtil.parse(startDate, Formats.DATE_YM));
 
-            while (s.getTimeInMillis() <= e.getTimeInMillis()){
+            while (s.getTimeInMillis() <= e.getTimeInMillis()) {
 
-                String nowDate = DateUtil.format(s.getTime(),Formats.DATE_YM);
+                String nowDate = DateUtil.format(s.getTime(), Formats.DATE_YM);
                 String regionNum = genRegionNum(call, nowDate, Vals.INT_6.intValue());
                 // 1_18801_202101
                 String startRow = regionNum + "_" + call + "_" + nowDate;
                 String endRow = startRow + "|";
-                String[] rows = {startRow,endRow};
+                String[] rows = {startRow, endRow};
                 rowsList.add(rows);
-                s.add(Calendar.MONTH , 1);
+                s.add(Calendar.MONTH, 1);
             }
         } catch (ParseException e) {
             e.printStackTrace();

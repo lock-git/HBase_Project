@@ -30,7 +30,8 @@ public class HBaseDao {
             // NX 有则不做操作
             HBaseUtil.createNamespaceNX(Names.NAMESPACE_CT.value());
             // XX 有才做操作
-            HBaseUtil.createTableXX(Names.TABLE_CALLLOG.value(), Vals.INT_6.intValue());
+            HBaseUtil.createTableXX(Names.TABLE_CALLLOG.value(), Vals.INT_6.intValue(),
+                    "com.lock.coprocesser.consumer.InsertUnActiveDataCoprocesser");
             HBaseUtil.end();
         } catch (IOException e) {
             e.printStackTrace();
@@ -62,6 +63,8 @@ public class HBaseDao {
         put.addColumn(Bytes.toBytes(Names.TABLE_FAMILY_INFO.value()),Bytes.toBytes("calltime"),Bytes.toBytes(calltime));
         put.addColumn(Bytes.toBytes(Names.TABLE_FAMILY_INFO.value()),Bytes.toBytes("duration"),Bytes.toBytes(duration));
         putList.add(put);
+
+        // HBase 协处理器
 
         if (putList.size() >= batchSize) {
             HBaseUtil.start();
