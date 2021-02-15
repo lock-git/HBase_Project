@@ -98,6 +98,8 @@ public class HBaseUtil {
         HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(tableName));
         HColumnDescriptor hColumnDescriptor = new HColumnDescriptor(Names.TABLE_FAMILY_INFO.value());
         tableDescriptor.addFamily(hColumnDescriptor);
+        HColumnDescriptor hColumnDescriptor1 = new HColumnDescriptor(Names.TABLE_FAMILY_UNACTIVE.value());
+        tableDescriptor.addFamily(hColumnDescriptor1);
         if (coprocessClass != null) {
             tableDescriptor.addCoprocessor(coprocessClass);
         }
